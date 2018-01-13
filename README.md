@@ -15,3 +15,7 @@ This project assumes that Groovy is isntalled on your system.
 ## About the Author 
 
 Steven Hicks is a developer that can be found at http://theexceptioncatcher.com. He has been a self taught, and formally educated developer for nearly 20 years.
+
+## Edits after Forking
+
+ccenergy: Rename folder based on photoalbum created property
