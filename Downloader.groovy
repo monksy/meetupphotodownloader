@@ -13,33 +13,35 @@ def albums = groupMeetup.get(path: 'photo_albums', query: defaultQueries)
 
 
 albumMap = albums.data.collectEntries {
-    [(it.id) : it.title ]
+    [(it.id) : [title:(it.title), created:(new Date(it.created).format("yyyy-MM-dd"))] ]
 }
 
-//https://api.meetup.com/Chicago-Reddit-Meetup/photo_albums/26197855?&sign=true&photo-host=public
-println albumMap
+println "albumMap Size: ${albumMap.size()}"
 
 albumMap.each{
-    id, name ->
+    id, album ->
         //Make directory
-        def currentDirectory = "$directory/${name.replaceAll("[\\W\\s]+", "")}"
+        def currentDirectory = "$directory/${album.created}_${(album.title).replaceAll("[\\W\\s]+", "")}"
         new File(currentDirectory).mkdir()
 
-        println "Getting all photos for the album $name"
+        println "Getting all photos for the album ${album.title}"
 
         //Request all photos under the id
         def results = groupMeetup.get(path:"photo_albums/$id/photos", query: defaultQueries)
 
         //Download
         results.data?.each {
-            println "- Downloading Photo: ${it.id}"
             String fileName = "$currentDirectory/${it.id}.jpg"
 
             //If the file does already exist lets not continue
             if (!new File(fileName).exists()) {
+                println "- Downloading Photo: ${it.id}"
                 new File(fileName).withOutputStream { out ->
                     out << new URL(it.highres_link).openStream()
                 }
+            }
+            else {
+                println "- Skipping Photo: ${it.id}"
             }
         }
 }
